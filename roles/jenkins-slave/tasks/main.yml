@@ -3,13 +3,21 @@
 - name: Add passwordless connection for jenkins
   copy: src=authorized_keys dest=/home/jenkins/.ssh/authorized_keys mode=0600 owner=jenkins
 
-- name: Install CouchDB
+# - name: Install CouchDB
+#  yum: name={{item}} state=present
+#  with_items:
+#   - couchdb
+
+#- name: Start CouchDB
+#  service: name=couchdb state=started
+
+- name: Install Docker
   yum: name={{item}} state=present
   with_items:
-   - couchdb
+   - docker
 
-- name: Start CouchDB
-  service: name=couchdb state=started
+- name: Start Docker
+  service: name=docker state=started
 
 #Ensure Jenkins is NOT installed: the master auto-installs it!
 - name: Ensure Jenkins is NOT installed
@@ -18,4 +26,13 @@
 # Create Jenkins work directory
 - name: Create /var/jenkins
   file: path=/var/jenkins state=directory mode=0700 owner=jenkins
+
+- name: Create docker_conf
+  copy: src=docker_conf dest=/etc/sudoers.d/docker_conf mode=0440 owner=root
+
+- name: create docker_run_couchdb.sh
+  copy: src=docker_run_couchdb.sh dest=/usr/bin/docker_run_couchdb.sh mode=0700 owner=root
+
+- name: create docker_stop_couchdb.sh
+  copy: src=docker_stop_couchdb.sh dest=/usr/bin/docker_stop_couchdb.sh mode=0700 owner=root
 
